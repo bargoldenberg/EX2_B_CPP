@@ -40,10 +40,13 @@ void Notebook::write(int page,int row, int column, Direction d, string s){
             if(this->m[page][row][(size_t)i]!='_'){
                 throw invalid_argument("Cannot write on what is writen!");
             }
-            if(!isprint(s.at((size_t)(i-column)))){
+            if(isprint(s.at((size_t)(i-column)))==0){
                 throw invalid_argument("cannot write this, char is unprintable!");
             }
-            this->m[page][row][(size_t)i]= s.at((size_t)(i-column));
+            if(s.at((size_t)(i-column))=='~'){
+                throw invalid_argument("use erase function to write ~");
+            }
+            this->m[page][row][(size_t)i]= (unsigned char)s.at((size_t)(i-column));
         }
     }else{
         if(column>=ROW_SIZE){
@@ -62,7 +65,10 @@ void Notebook::write(int page,int row, int column, Direction d, string s){
             if(this->m[page][i][(size_t)column]!='_'){
                 throw invalid_argument("Cannot write on what is writen!");
             }
-            this->m[page][i][(size_t)column] = s.at((size_t)(i-row));
+            if(s.at((size_t)(i-row))=='~'){
+                throw invalid_argument("use erase function to write ~");
+            }
+            this->m[page][i][(size_t)column] = (unsigned char)s.at((size_t)(i-row));
         }
         
     }
@@ -90,20 +96,20 @@ string Notebook::read(int page, int row, int column, Direction d, int length){
             }
         }
         return ans;
-    }else{
-        if(column>=ROW_SIZE){
-            throw invalid_argument("out of bounds!");
-        }
-        for(int i=row;i<row+length;i++){
-            if(this->m[page].count(i)==0){
-                ans.push_back('_');
-            }else{
-                ans.push_back(this->m[page][i][(size_t)column]);
-            }
-            
-        }
-        return ans;
     }
+    if(column>=ROW_SIZE){
+        throw invalid_argument("out of bounds!");
+    }
+    for(int i=row;i<row+length;i++){
+        if(this->m[page].count(i)==0){
+            ans.push_back('_');
+        }else{
+            ans.push_back(this->m[page][i][(size_t)column]);
+        }
+        
+    }
+    return ans;
+    
 }
 void Notebook::erase(int page, int row, int column, Direction d, int length){
     if(length<0){
@@ -123,9 +129,9 @@ void Notebook::erase(int page, int row, int column, Direction d, int length){
                     this->m[page][row][(size_t)k] = '_';
                 }
             }
-            if(this->m[page][row][(size_t)i]=='~'){
-                throw invalid_argument("cannot erase erased");
-            }
+            // if(this->m[page][row][(size_t)i]=='~'){
+            //     throw invalid_argument("cannot erase erased");
+            // }
             this->m[page][row][(size_t)i]='~';
             
         }
@@ -174,9 +180,8 @@ int Notebook::findmin(int page){
     }
     if(minimum==0){
         return minimum;
-    }else{
-        return minimum-1;
     }
+    return minimum-1;
     
 }
 
@@ -192,6 +197,9 @@ int Notebook::findmax(int page){
 }
 
 void Notebook::show(int page){
+    if(page<0){
+        throw invalid_argument("Page must be non-negitive!");
+    }
     int minimum = findmin(page);
     int maximum = findmax(page);
     for(int i=minimum;i<=maximum;i++){
