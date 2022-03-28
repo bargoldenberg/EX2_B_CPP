@@ -13,12 +13,19 @@ const int MAX_INT = 2147483647;
 const int ROW_SIZE = 100;
 const double LOG_10 = log(10);
 Notebook::Notebook(){
-    //map<int,map<int,vector<char>>> m;
     this->min = MAX_INT;
     this->max = 0;
 }
 
-   
+/**
+ * @brief This method writes to the
+ * 
+ * @param page 
+ * @param row 
+ * @param column 
+ * @param d 
+ * @param s 
+ */
 void Notebook::write(int page,int row, int column, Direction d, string s){
     if(page<0||row<0||column<0){
         throw runtime_error("negative argument!");
